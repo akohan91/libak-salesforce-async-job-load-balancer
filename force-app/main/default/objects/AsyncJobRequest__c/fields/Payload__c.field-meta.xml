@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Payload__c</fullName>
+    <description>A flexible field for passing serialized data (such as JSON) to the batch job, allowing customized parameters without adding more fields.</description>
+    <externalId>false</externalId>
+    <inlineHelpText>Stores additional data or parameters required for this batch job. Use JSON format to structure complex data.</inlineHelpText>
+    <label>Payload</label>
+    <length>131072</length>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>LongTextArea</type>
+    <visibleLines>3</visibleLines>
+</CustomField>

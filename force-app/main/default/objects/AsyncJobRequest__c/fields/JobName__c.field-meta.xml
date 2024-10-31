@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>JobName__c</fullName>
+    <description>Provides a unique, readable identifier for each job request, making it easier to locate and track jobs.</description>
+    <externalId>false</externalId>
+    <inlineHelpText>A descriptive name for the batch job, useful for tracking and identification.</inlineHelpText>
+    <label>Job Name</label>
+    <length>255</length>
+    <required>true</required>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Text</type>
+    <unique>false</unique>
+</CustomField>

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>ProcessedTime__c</fullName>
+    <description>Indicates when the job started processing, helping to analyze and optimize processing times.</description>
+    <externalId>false</externalId>
+    <inlineHelpText>The date and time when this job began processing.</inlineHelpText>
+    <label>Processed Time</label>
+    <required>false</required>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>DateTime</type>
+</CustomField>

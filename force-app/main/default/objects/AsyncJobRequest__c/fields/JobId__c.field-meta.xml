@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>JobId__c</fullName>
+    <caseSensitive>true</caseSensitive>
+    <description>Unique identifier for the associated Apex batch job. Used for updating to prevent duplicate entries.</description>
+    <externalId>true</externalId>
+    <inlineHelpText>Unique identifier for the associated Apex batch job. Used for updating to prevent duplicate entries.</inlineHelpText>
+    <label>Job Id</label>
+    <length>18</length>
+    <required>false</required>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Text</type>
+    <unique>true</unique>
+</CustomField>
