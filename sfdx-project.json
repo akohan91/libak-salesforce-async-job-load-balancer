@@ -3,6 +3,10 @@
     {
       "path": "force-app",
       "default": true
+    },
+    {
+      "path": "demo-app",
+      "default": false
     }
   ],
   "name": "Libak_ApexBatchLoadBalancer",

@@ -9,10 +9,10 @@ public with sharing class BatchableJobExecutor implements IAsyncJobExecutor {
 				AsyncJobRequestSelector.instance.getFirstBatchQueueItem()
 			);
 			Type classType = Type.forName(asyncJobRequest.record().JobName__c);
-			Object batchJobInstance = classType.newInstance();
+			BatchJob batchJobInstance = (BatchJob)classType.newInstance();
 			asyncJobRequest
 				.setJobId(Database.executeBatch(
-					new BatchJob(batchJobInstance),
+					batchJobInstance,
 					Integer.valueOf(asyncJobRequest.record().BatchSize__c))
 				).setJobStatus(AsyncJobRequestConstants.JobStatus.Pending);
 		} catch (Exception exc) {

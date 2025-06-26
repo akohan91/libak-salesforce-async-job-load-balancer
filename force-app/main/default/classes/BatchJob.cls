@@ -1,19 +1,15 @@
-public with sharing class BatchJob implements Database.Batchable<SObject>, Database.Stateful, Database.AllowsCallouts {
-	private Database.Batchable<SObject> batchJobInstance;
+public with sharing abstract class BatchJob implements Database.Batchable<SObject>, Database.Stateful, Database.AllowsCallouts {
 
-	public BatchJob(Object batchJobInstance) {
-		if (!(batchJobInstance instanceof Database.Batchable<SObject>)) {
-			throw new BatchJobException('The class must implement the Database.Batchable<SObject> interface.');
-		}
-		this.batchJobInstance = (Database.Batchable<SObject>) batchJobInstance;
-	}
+	abstract protected Database.QueryLocator doStart(Database.BatchableContext batchContext);
+	abstract protected void doExecute(Database.BatchableContext batchContext, List<SObject> scope);
+	abstract protected void doFinish(Database.BatchableContext batchContext);
 
 	public Database.QueryLocator start(Database.BatchableContext batchContext) {
 		try {
 			EventBus.publish(
 				this.createJobChangeStatusEvent(AsyncJobRequestConstants.JobStatus.Processing, batchContext.getJobId())
 			);
-			return (Database.QueryLocator)this.batchJobInstance.start(batchContext);
+			return (Database.QueryLocator)this.doStart(batchContext);
 		} catch (Exception exc) {
 			EventBus.publish(
 				new List<AsyncJob__e>{
@@ -27,7 +23,7 @@ public with sharing class BatchJob implements Database.Batchable<SObject>, Datab
 
 	public void execute(Database.BatchableContext batchContext, List<SObject> scope) {
 		try {
-			this.batchJobInstance.execute(batchContext, scope);
+			this.doExecute(batchContext, scope);
 		} catch (Exception exc) {
 			EventBus.publish(
 				this.createJobErrorEvent(exc, batchContext.getJobId())
@@ -38,7 +34,7 @@ public with sharing class BatchJob implements Database.Batchable<SObject>, Datab
 
 	public void finish(Database.BatchableContext batchContext) {
 		try {
-			this.batchJobInstance.finish(batchContext);
+			this.doFinish(batchContext);
 		} catch (Exception exc) {
 			EventBus.publish(
 				this.createJobErrorEvent(exc, batchContext.getJobId())
