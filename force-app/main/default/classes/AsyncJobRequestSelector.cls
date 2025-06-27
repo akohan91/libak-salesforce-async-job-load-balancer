@@ -65,6 +65,26 @@ public with sharing class AsyncJobRequestSelector {
 			LIMIt 1
 		];
 	}
+
+	public AsyncJobRequest__c getFirstQueueableQueueItem() {
+		return [
+			SELECT Id,
+				BatchSize__c,
+				ErrorMessage__c,
+				FinishedTime__c,
+				JobStatus__c,
+				JobId__c,
+				JobName__c,
+				Payload__c,
+				ProcessedTime__c,
+				RequestedTime__c
+			FROM AsyncJobRequest__c
+			WHERE JobStatus__c = :AsyncJobRequestConstants.JobStatus.Waiting.name()
+				AND RecordTypeId = :AsyncJobRequestConstants.recordType.QueueableId
+			ORDER BY CreatedDate
+			LIMIt 1
+		];
+	}
 	
 	public List<AsyncJobRequest__c> getByJobStatus(String jobStatus) {
 		return [

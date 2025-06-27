@@ -1,4 +1,6 @@
-public with sharing abstract class BatchJob implements Database.Batchable<SObject>, Database.Stateful, Database.AllowsCallouts {
+public with sharing abstract class BatchJob
+	extends AsyncJob
+	implements Database.Batchable<SObject>, Database.Stateful, Database.AllowsCallouts {
 
 	abstract protected Database.QueryLocator doStart(Database.BatchableContext batchContext);
 	abstract protected void doExecute(Database.BatchableContext batchContext, List<SObject> scope);
@@ -45,26 +47,6 @@ public with sharing abstract class BatchJob implements Database.Batchable<SObjec
 			);
 		}
 		
-	}
-
-	private AsyncJob__e createJobErrorEvent(Exception exc, Id asyncJobId) {
-		String errorMessage = String.format(
-			AsyncJobRequestConstants.ERROR_TMPL,
-			new List<String>{exc.getMessage(), exc.getStackTraceString()}
-		);
-		return new AsyncJob__e(
-			Action__c = AsyncJobEventConstants.Action.ADD_ERROR.name(),
-			AsyncJobId__c = asyncJobId,
-			Payload__c = errorMessage
-		);
-	}
-
-	private AsyncJob__e createJobChangeStatusEvent(AsyncJobRequestConstants.JobStatus status, Id asyncJobId) {
-		return new AsyncJob__e(
-			Action__c = AsyncJobEventConstants.Action.CHANGE_STATUS.name(),
-			AsyncJobId__c = asyncJobId,
-			Payload__c = status.name()
-		);
 	}
 
 	public class BatchJobException extends Exception {}
