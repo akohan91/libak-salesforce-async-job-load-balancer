@@ -14,17 +14,17 @@ public with sharing class AsyncJobRequest {
 		return this;
 	}
 
-	public AsyncJobRequest setJobStatus(AsyncJobRequestConstants.JobStatus status) {
-		asyncJobRequest.JobStatus__c = status.name();
-		switch on status {
+	public AsyncJobRequest setJobStatus(AsyncJob.ChangeStatusPayload changeStatusPayload) {
+		asyncJobRequest.JobStatus__c = changeStatusPayload.status.name();
+		switch on changeStatusPayload.status {
 			when Pending {
-				asyncJobRequest.RequestedTime__c = Datetime.now();
+				asyncJobRequest.RequestedTime__c = changeStatusPayload.changedDatetime;
 			}
 			when Processing {
-				asyncJobRequest.ProcessedTime__c = Datetime.now();
+				asyncJobRequest.ProcessedTime__c = changeStatusPayload.changedDatetime;
 			}
 			when Completed {
-				asyncJobRequest.FinishedTime__c = Datetime.now();
+				asyncJobRequest.FinishedTime__c = changeStatusPayload.changedDatetime;
 			}
 		}
 		return this;

@@ -8,11 +8,11 @@ public with sharing class ChangeStatusJobEventHandler implements IAsyncJobEventH
 		AsyncJobRequest asyncJobRequest = new AsyncJobRequest(
 			AsyncJobRequestSelector.instance.getByJobId(event.AsyncJobId__c)
 		);
-		AsyncJobRequestConstants.JobStatus jobStatus = AsyncJobRequestConstants.JobStatus.valueOf(event.Payload__c);
+		AsyncJob.ChangeStatusPayload changeStatusPayload = (AsyncJob.ChangeStatusPayload)JSON.deserialize(event.Payload__c, AsyncJob.ChangeStatusPayload.class);
 		asyncJobRequest
-			.setJobStatus(jobStatus)
+			.setJobStatus(changeStatusPayload)
 			.updateRecord();
-		if (completedStatuses.contains(jobStatus)) {
+		if (completedStatuses.contains(changeStatusPayload.status)) {
 			EventBus.publish(new AsyncJob__e(
 				Action__c = AsyncJobEventConstants.Action.QUEUE_JOB.name(),
 				JobRequestTypeId__c = AsyncJobRequestConstants.recordType.BatchableId

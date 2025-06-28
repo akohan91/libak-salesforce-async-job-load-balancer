@@ -9,10 +9,10 @@ public with sharing class QueueableJobExecutor implements IAsyncJobExecutor {
 			QueueableJob queueableJobInstance = (QueueableJob)classType.newInstance();
 			asyncJobRequest.setJobId(
 				System.enqueueJob(queueableJobInstance)
-			).setJobStatus(AsyncJobRequestConstants.JobStatus.Pending);
+			).setJobStatus(new AsyncJob.ChangeStatusPayload(AsyncJobRequestConstants.JobStatus.Pending, Datetime.now()));
 		} catch (Exception exc) {
 			asyncJobRequest
-				.setJobStatus(AsyncJobRequestConstants.JobStatus.Failed)
+				.setJobStatus(new AsyncJob.ChangeStatusPayload(AsyncJobRequestConstants.JobStatus.Failed, Datetime.now()))
 				.addErrorMessage(exc);
 		} finally {
 			asyncJobRequest.updateRecord();
