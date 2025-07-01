@@ -1,4 +1,11 @@
 public with sharing virtual class AsyncJob {
+
+	protected String payload;
+
+	public AsyncJob withPayload(String payload) {
+		this.payload = payload;
+		return this;
+	}
 	
 	public AsyncJob__e createJobErrorEvent(Exception exc, Id asyncJobId) {
 		String errorMessage = String.format(
