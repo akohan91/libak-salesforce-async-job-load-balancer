@@ -1,12 +1,12 @@
 trigger AsyncJobRequestTrigger on AsyncJobRequest__c (after insert) {
-	List<AsyncJob__e> asyncJobEvents = new List<AsyncJob__e>();
-	for (AsyncJobRequest__c asyncJobRequest : new AsyncJobRequestDistributor(Trigger.new).getNewAsyncJobRequests()) {
-		asyncJobEvents.add(new AsyncJob__e(
+	List<AsyncJob__e> jobEvents = new List<AsyncJob__e>();
+	for (AsyncJobRequest__c jobRequestRecord : new AsyncJobRequestDistributor(Trigger.new).getNewAsyncJobRequests()) {
+		jobEvents.add(new AsyncJob__e(
 			Action__c = AsyncJobEventConstants.Action.QUEUE_JOB.name(),
-			JobRequestTypeId__c = asyncJobRequest.RecordTypeId
+			JobRequestTypeId__c = jobRequestRecord.RecordTypeId
 		));
 	}
-	if (!asyncJobEvents.isEmpty()) {
-		EventBus.publish(asyncJobEvents);
+	if (!jobEvents.isEmpty()) {
+		EventBus.publish(jobEvents);
 	}
 }

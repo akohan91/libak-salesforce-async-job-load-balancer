@@ -1,4 +1,4 @@
-public with sharing abstract class BatchJob
+public with sharing abstract class BatchableJob
 	extends AsyncJob
 	implements Database.Batchable<SObject>, Database.Stateful, Database.AllowsCallouts
 {

@@ -1,4 +1,4 @@
-public with sharing class TestBatch extends BatchJob {
+public with sharing class TestBatch extends BatchableJob {
 	protected override Database.QueryLocator doStart(Database.BatchableContext batchContext) {
 		return Database.getQueryLocator('SELECT Id FROM Account');
 	}

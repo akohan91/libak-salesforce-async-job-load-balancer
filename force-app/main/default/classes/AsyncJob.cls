@@ -1,9 +1,9 @@
 public with sharing virtual class AsyncJob {
 
-	protected String payload;
+	protected String jobPayload;
 
 	public AsyncJob withPayload(String payload) {
-		this.payload = payload;
+		this.jobPayload = payload;
 		return this;
 	}
 	
@@ -19,11 +19,11 @@ public with sharing virtual class AsyncJob {
 		);
 	}
 
-	public AsyncJob__e createJobChangeStatusEvent(AsyncJobRequestConstants.JobStatus status, Id asyncJobId) {
+	public AsyncJob__e createJobChangeStatusEvent(AsyncJobRequestConstants.JobStatus newStatus, Id asyncJobId) {
 		return new AsyncJob__e(
 			Action__c = AsyncJobEventConstants.Action.CHANGE_STATUS.name(),
 			AsyncJobId__c = asyncJobId,
-			Payload__c = new ChangeStatusPayload(status, Datetime.now()).json()
+			Payload__c = new ChangeStatusPayload(newStatus, Datetime.now()).json()
 		);
 	}
 

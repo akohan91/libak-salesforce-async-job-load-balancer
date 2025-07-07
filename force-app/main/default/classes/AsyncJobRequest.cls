@@ -1,30 +1,30 @@
 public with sharing class AsyncJobRequest {
-	private AsyncJobRequest__c asyncJobRequest;
+	private AsyncJobRequest__c jobRequestRecord;
 
-	public AsyncJobRequest(AsyncJobRequest__c asyncJobRequest) {
-		this.asyncJobRequest = asyncJobRequest;
+	public AsyncJobRequest(AsyncJobRequest__c jobRequestRecord) {
+		this.jobRequestRecord = jobRequestRecord;
 	}
 
 	public AsyncJobRequest__c record() {
-		return this.asyncJobRequest;
+		return this.jobRequestRecord;
 	}
 
 	public AsyncJobRequest setJobId(Id jobId) {
-		asyncJobRequest.JobId__c = jobId;
+		jobRequestRecord.JobId__c = jobId;
 		return this;
 	}
 
-	public AsyncJobRequest setJobStatus(AsyncJob.ChangeStatusPayload changeStatusPayload) {
-		asyncJobRequest.JobStatus__c = changeStatusPayload.status.name();
-		switch on changeStatusPayload.status {
+	public AsyncJobRequest setJobStatus(AsyncJob.ChangeStatusPayload statusPayload) {
+		jobRequestRecord.JobStatus__c = statusPayload.status.name();
+		switch on statusPayload.status {
 			when Pending {
-				asyncJobRequest.RequestedTime__c = changeStatusPayload.changedDatetime;
+				jobRequestRecord.RequestedTime__c = statusPayload.changedDatetime;
 			}
 			when Processing {
-				asyncJobRequest.ProcessedTime__c = changeStatusPayload.changedDatetime;
+				jobRequestRecord.ProcessedTime__c = statusPayload.changedDatetime;
 			}
 			when Completed {
-				asyncJobRequest.FinishedTime__c = changeStatusPayload.changedDatetime;
+				jobRequestRecord.FinishedTime__c = statusPayload.changedDatetime;
 			}
 		}
 		return this;
@@ -40,16 +40,16 @@ public with sharing class AsyncJobRequest {
 	}
 
 	public AsyncJobRequest addErrorMessage(String errorMessage) {
-		if (this.asyncJobRequest.ErrorMessage__c == null) {
-			this.asyncJobRequest.ErrorMessage__c = errorMessage;
+		if (this.jobRequestRecord.ErrorMessage__c == null) {
+			this.jobRequestRecord.ErrorMessage__c = errorMessage;
 		} else {
-			this.asyncJobRequest.ErrorMessage__c += errorMessage;
+			this.jobRequestRecord.ErrorMessage__c += errorMessage;
 		}
 		return this;
 	}
 
 	public AsyncJobRequest updateRecord() {
-		update this.asyncJobRequest;
+		update this.jobRequestRecord;
 		return this;
 	}
 }
