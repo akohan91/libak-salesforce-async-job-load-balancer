@@ -19,4 +19,10 @@ public with sharing class AsyncJobEventService {
 		IAsyncJobEventHandler handler = this.asyncJobEventHandlers.get(AsyncJobEventConstants.Action.valueOf(event.Action__c));
 		handler.handleEvent(event);
 	}
+	
+	// For testing purposes only
+	@TestVisible
+	private void setEventHandler(AsyncJobEventConstants.Action action, IAsyncJobEventHandler handler) {
+		this.asyncJobEventHandlers.put(action, handler);
+	}
 }
