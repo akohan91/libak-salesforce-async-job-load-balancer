@@ -16,7 +16,7 @@ public with sharing class BatchFlexQueueService {
 			WHERE JobType = 'BatchApex'
 				AND Status = 'Holding'
 		];
-		Integer availableSlots = 3 - holdingJobsCount;
+		Integer availableSlots = 100 - holdingJobsCount;
 		return availableSlots;
 	}
 }
