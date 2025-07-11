@@ -1,5 +1,7 @@
 # Async Job Load Balancer Framework
 
+> **Note:** This framework is currently in the development process. Features and implementations may change as development progresses.
+
 ## Overview
 
 This framework provides a robust, event-driven mechanism for managing and load-balancing asynchronous Apex jobs (Batchable and Queueable) in Salesforce. It leverages custom objects, platform events, and Apex classes to queue, execute, monitor, and handle errors for asynchronous jobs, ensuring optimal resource utilization and extensibility.
@@ -183,17 +185,72 @@ insert req;
 
 ## Diagram
 
-```mermaid
-flowchart TD
-    A[AsyncJobRequest__c Created] --> B[AsyncJobRequestTrigger]
-    B --> C[AsyncJob__e (QUEUE_JOB)]
-    C --> D[AsyncJobEventTrigger]
-    D --> E[AsyncJobEventService]
-    E --> F[QueueJobEventHandler]
-    F --> G[BatchableJobExecutor/QueueableJobExecutor]
-    G --> H[Job Execution]
-    H --> I[AsyncJob__e (CHANGE_STATUS/ADD_ERROR)]
-    I --> D
+Process Flow:
 ```
-
----
++-----------------------------+
+| 1. AsyncJobRequest__c       |
+|    CREATED                  |
++-------------+---------------+
+              |
+              | Trigger fires
+              v
++-------------+---------------+
+| 2. AsyncJobRequestTrigger   |
+|    PROCESSES REQUEST        |
++-------------+---------------+
+              |
+              | Publishes event
+              v
++-------------+---------------+
+| 3. AsyncJob__e              |
+|    QUEUE_JOB ACTION         |
++-------------+---------------+
+              |
+              | Event received
+              v
++-------------+---------------+
+| 4. AsyncJobEventTrigger     |
+|    HANDLES EVENT            |
++-------------+---------------+
+              |
+              | Delegates to
+              v
++-------------+---------------+
+| 5. AsyncJobEventService     |
+|    ROUTES EVENT             |
++-------------+---------------+
+              |
+              | Routes to handler
+              v
++-------------+---------------+
+| 6. QueueJobEventHandler     |
+|    PROCESSES QUEUE REQUEST  |
++-------------+---------------+
+              |
+              | Executes via
+              v
++-------------+---------------+
+| 7. Job Executor             |
+|   (Batchable/Queueable)     |
++-------------+---------------+
+              |
+              | Initiates
+              v
++-------------+---------------+
+| 8. Job Execution            |
+|    RUNNING                  |
++-------------+---------------+
+              |
+              | Status updates/errors
+              v
++-------------+---------------+
+| 9. AsyncJob__e              |
+|   (CHANGE_STATUS/ADD_ERROR) |
++-------------+---------------+
+              |
+              | Feedback loop
+              v
+              +---------------+
+              | Back to step 4|
+              +---------------+
+```
