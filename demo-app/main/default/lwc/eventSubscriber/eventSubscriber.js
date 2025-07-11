@@ -13,7 +13,11 @@ export default class EventSubscriber extends LightningElement {
 		try {
 			console.log('test')
 			const eventHandler = ({data}) => {
-				console.log(data.payload.Action__c, data.payload.Payload__c);
+				console.log(data.payload.Action__c, `
+		Payload: ${data.payload.Payload__c};
+		AsyncJobId__c: ${data.payload.AsyncJobId__c};
+		JobRequestTypeId__c: ${data.payload.JobRequestTypeId__c};
+		JobRequestId__c: ${data.payload.JobRequestId__c};`);
 			}
 			const response = await subscribe( '/event/AsyncJob__e', START_FROM_THE_MOST_RECENT_EVENT, eventHandler);
 			console.log('response',response);
