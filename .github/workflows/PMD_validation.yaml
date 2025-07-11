@@ -1,0 +1,21 @@
+name: PMD Verification
+
+permissions:
+  contents: read
+  pull-requests: write
+
+on:
+  workflow_dispatch:
+  pull_request:
+    branches:
+      - main
+      - develop
+    types:
+      - opened
+      - synchronize
+      - reopened
+
+jobs:
+  deploy_verification:
+    uses: akohan91/libak-salesforce-ci/.github/workflows/pmd_validation.yaml@main
+    secrets: inherit
