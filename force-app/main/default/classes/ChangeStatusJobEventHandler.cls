@@ -15,7 +15,7 @@ public with sharing class ChangeStatusJobEventHandler implements IAsyncJobEventH
 		if (finalStatuses.contains(statusPayload.status)) {
 			EventBus.publish(new AsyncJob__e(
 				Action__c = AsyncJobEventConstants.Action.QUEUE_JOB.name(),
-				JobRequestTypeId__c = AsyncJobRequestConstants.recordType.BatchableId
+				JobRequestTypeId__c = jobRequest.record().RecordTypeId
 			));
 		}
 	}
