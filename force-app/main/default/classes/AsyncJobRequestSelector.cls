@@ -47,7 +47,7 @@ public with sharing class AsyncJobRequestSelector {
 	}
 
 	public AsyncJobRequest__c getFirstBatchQueueItem() {
-		return [
+		List<AsyncJobRequest__c> jobRequests = [
 			SELECT Id,
 				BatchSize__c,
 				ErrorMessage__c,
@@ -64,10 +64,12 @@ public with sharing class AsyncJobRequestSelector {
 			ORDER BY CreatedDate
 			LIMIt 1
 		];
+		
+		return jobRequests.size() > 0 ? jobRequests.get(0) : null;
 	}
 
 	public AsyncJobRequest__c getFirstQueueableQueueItem() {
-		return [
+		List<AsyncJobRequest__c> jobRequests = [
 			SELECT Id,
 				BatchSize__c,
 				ErrorMessage__c,
@@ -84,6 +86,8 @@ public with sharing class AsyncJobRequestSelector {
 			ORDER BY CreatedDate
 			LIMIt 1
 		];
+		
+		return jobRequests.size() > 0 ? jobRequests.get(0) : null;
 	}
 	
 	public List<AsyncJobRequest__c> getByJobStatus(String jobStatus) {
