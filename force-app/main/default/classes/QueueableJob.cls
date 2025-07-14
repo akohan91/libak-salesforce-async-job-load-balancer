@@ -6,7 +6,7 @@ public with sharing abstract class QueueableJob
 	abstract protected void doExecute(QueueableContext context);
 
 	public void execute(QueueableContext context) {
-		System.attachFinalizer((Finalizer)this);
+		this.attachFinalizer();
 		EventBus.publish(this.createJobChangeStatusEvent(AsyncJobRequestConstants.JobStatus.Processing, context.getJobId()));
 		this.doExecute(context);
 	}
@@ -18,5 +18,13 @@ public with sharing abstract class QueueableJob
 		} else {
 			EventBus.publish(this.createJobChangeStatusEvent(AsyncJobRequestConstants.JobStatus.Completed, context.getAsyncApexJobId()));
 		}
+	}
+
+	
+	/**
+	 * @description Te method is created just for unit tests purposes
+	 */
+	virtual protected void attachFinalizer() {
+		System.attachFinalizer((Finalizer)this);
 	}
 }
