@@ -30,7 +30,7 @@ private class AsyncJobEventServiceTest {
 		
 		AsyncJob__e errorEvent = new AsyncJob__e(
 			Action__c = AsyncJobEventConstants.Action.ADD_ERROR.name(),
-			AsyncJobId__c = '707000000000000AAA',
+			AsyncJobId__c = new FakeId(AsyncJob__e.SObjectType).getFakeId(),
 			Payload__c = 'Test error payload'
 		);
 		
@@ -53,7 +53,7 @@ private class AsyncJobEventServiceTest {
 			AsyncJobRequestConstants.JobStatus.Completed, Datetime.now());
 		AsyncJob__e statusEvent = new AsyncJob__e(
 			Action__c = AsyncJobEventConstants.Action.CHANGE_STATUS.name(),
-			AsyncJobId__c = '707000000000000AAA',
+			AsyncJobId__c = new FakeId(AsyncJob__e.SObjectType).getFakeId(),
 			Payload__c = payload.json()
 		);
 		
@@ -74,7 +74,7 @@ private class AsyncJobEventServiceTest {
 		
 		AsyncJob__e queueEvent = new AsyncJob__e(
 			Action__c = AsyncJobEventConstants.Action.QUEUE_JOB.name(),
-			JobRequestTypeId__c = '012000000000000AAA'
+			JobRequestTypeId__c = new FakeId(AsyncJob__e.SObjectType).getFakeId()
 		);
 		
 		Test.startTest();

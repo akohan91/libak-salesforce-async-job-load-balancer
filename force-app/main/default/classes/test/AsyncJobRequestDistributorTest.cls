@@ -18,7 +18,9 @@ private class AsyncJobRequestDistributorTest {
 		List<AsyncJobRequest__c> mockRecords = createMockJobRequests();
 		Map<Id, AsyncJobRequest__c> oldRecordsMap = new Map<Id, AsyncJobRequest__c>();
 		
-		oldRecordsMap.put('a07000000000001AAA', mockRecords[0]);
+		for (AsyncJobRequest__c jobRequest : mockRecords) {
+			oldRecordsMap.put(jobRequest.RecordTypeId, mockRecords[0]);
+		}
 		
 		Test.startTest();
 		AsyncJobRequestDistributor distributor = new AsyncJobRequestDistributor(mockRecords, oldRecordsMap);
@@ -78,7 +80,9 @@ private class AsyncJobRequestDistributorTest {
 		AsyncJobRequestDistributor distributor = new AsyncJobRequestDistributor(mockRecords);
 		
 		Test.startTest();
-		List<AsyncJobRequest__c> noRequests = distributor.getAsyncJobRequestsByRecordTypeId('012000000000003AAA');
+		List<AsyncJobRequest__c> noRequests = distributor.getAsyncJobRequestsByRecordTypeId(
+			new FakeId(RecordType.SObjectType.getDescribe().getSobjectType()).getFakeId()
+		);
 		Test.stopTest();
 		
 		Assert.areEqual(0, noRequests.size(), 'Should return an empty list for non-existing record type');

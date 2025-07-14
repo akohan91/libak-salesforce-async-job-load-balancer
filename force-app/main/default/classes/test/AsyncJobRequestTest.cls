@@ -1,7 +1,7 @@
 @IsTest
 private class AsyncJobRequestTest {
 	
-	private static final String TEST_JOB_ID = '707000000000000AAA';
+	private static final String TEST_JOB_ID = new FakeId(AsyncApexJob.sObjectType).getFakeId();
 	
 	@IsTest
 	static void testConstructor() {

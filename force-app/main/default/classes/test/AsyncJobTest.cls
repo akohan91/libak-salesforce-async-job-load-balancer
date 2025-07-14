@@ -2,7 +2,7 @@
 private class AsyncJobTest {
 	
 	private static final String TEST_PAYLOAD = '{"data":"test value"}';
-	private static final String MOCK_JOB_ID = '707000000000000AAA';
+	private static final String MOCK_JOB_ID = new FakeId(AsyncApexJob.sObjectType).getFakeId();
 	
 	/**
 	 * Test implementation of AsyncJob for testing purposes
