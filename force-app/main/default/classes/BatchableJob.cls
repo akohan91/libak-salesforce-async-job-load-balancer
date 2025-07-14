@@ -34,6 +34,7 @@ public with sharing abstract class BatchableJob
 		} catch (Exception exc) {
 			EventBus.publish(this.createJobErrorEvent(exc, batchContext.getJobId()));
 			EventBus.publish(this.createJobChangeStatusEvent(AsyncJobRequestConstants.JobStatus.Failed, batchContext.getJobId()));
+			throw exc;
 		}
 	}
 
