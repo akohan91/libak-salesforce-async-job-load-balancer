@@ -1,0 +1,33 @@
+name: PMD Verification
+
+permissions:
+  contents: read
+  pull-requests: write
+
+on:
+  workflow_dispatch:
+  pull_request:
+    branches:
+      - main
+      - develop
+    types:
+      - opened
+      - synchronize
+      - reopened
+
+jobs:
+  deploy_verification:
+    uses: akohan91/libak-salesforce-ci/.github/workflows/pmd_validation.yaml@main
+    with:
+      # Path to source code (optional, default is 'force-app/main/default')
+      #source-path: 'force-app/main/default'
+      
+      # Path to PMD ruleset XML (optional)
+      #ruleset-path: './libak-salesforce-ci/rulesets/apex/pmd_rule_set.xml'
+      
+      # Set to false if you want to analyze all files, not just modified ones
+      analyze-modified-files-only: false
+      
+      # Set to true if you want GitHub annotations for violations
+      #create-github-annotations: false
+    secrets: inherit
