@@ -2,27 +2,6 @@
 public with sharing class QueueableJobTest {
 	
 	/**
-	 * Test implementation of QueueableJob for testing
-	 */
-	private class TestQueueableJob extends QueueableJob {
-		public Boolean executeCalled = false;
-		public Exception exceptionToThrow;
-		
-		protected override void doExecute(QueueableContext context) {
-			executeCalled = true;
-			if (exceptionToThrow != null) {
-				throw exceptionToThrow;
-			}
-		}
-
-		
-		@SuppressWarnings('EmptyStatementBlock')
-		override protected void attachFinalizer() {
-			// don't attach finalizer to test context
-		}
-	}
-	
-	/**
 	 * Mock implementation of QueueableContext for testing
 	 */
 	private class MockQueueableContext implements System.QueueableContext {
@@ -73,7 +52,7 @@ public with sharing class QueueableJobTest {
 		AsyncJobRequestService.instance.setBypass();
 		insert new AsyncJobRequest__c(
 			RecordTypeId = AsyncJobRequestConstants.recordType.QueueableId,
-			JobName__c = TestQueueableJob.class.getName(),
+			JobName__c = MockQueueableJob.class.getName(),
 			JobId__c = new FakeId(AsyncApexJob.sObjectType).getFakeId()
 		);
 	}
@@ -84,7 +63,7 @@ public with sharing class QueueableJobTest {
 			AsyncJobRequestConstants.JobStatus.Waiting.name()
 		);
 		Assert.areEqual(1, jobRequests.size(), 'Should have exactly one job request in Waiting status');
-		TestQueueableJob job = new TestQueueableJob();
+		MockQueueableJob job = new MockQueueableJob();
 		MockQueueableContext mockContext = new MockQueueableContext(jobRequests.get(0).JobId__c);
 		
 		Test.startTest();
@@ -107,7 +86,7 @@ public with sharing class QueueableJobTest {
 			AsyncJobRequestConstants.JobStatus.Waiting.name()
 		);
 		Assert.areEqual(1, jobRequests.size(), 'Should have exactly one job request in Waiting status');
-		TestQueueableJob job = new TestQueueableJob();
+		MockQueueableJob job = new MockQueueableJob();
 		MockFinalizerContext mockContext = new MockFinalizerContext(
 			jobRequests.get(0).JobId__c,
 			System.ParentJobResult.SUCCESS,
@@ -134,7 +113,7 @@ public with sharing class QueueableJobTest {
 			AsyncJobRequestConstants.JobStatus.Waiting.name()
 		);
 		Assert.areEqual(1, jobRequests.size(), 'Should have exactly one job request in Waiting status');
-		TestQueueableJob job = new TestQueueableJob();
+		MockQueueableJob job = new MockQueueableJob();
 		Exception testException = new IllegalArgumentException('Test exception message');
 		
 		MockFinalizerContext mockContext = new MockFinalizerContext(
