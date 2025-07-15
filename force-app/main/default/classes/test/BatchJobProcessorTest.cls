@@ -7,7 +7,7 @@ public with sharing class BatchJobProcessorTest {
 
 		insert new AsyncJobRequest__c(
 			RecordTypeId = AsyncJobRequestConstants.recordType.BatchableId,
-			JobName__c = BatchJobProcessorTestBatchableJob.class.getName(),
+			JobName__c = MockBatchableJob.class.getName(),
 			BatchSize__c = 200
 		);
 	}

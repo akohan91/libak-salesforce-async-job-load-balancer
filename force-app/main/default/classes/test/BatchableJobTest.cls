@@ -1,40 +1,5 @@
 @IsTest
 private class BatchableJobTest {
-
-	/**
-	 * Test implementation of BatchableJob for testing
-	 */
-	private class TestBatchableJob extends BatchableJob {
-		public Boolean startCalled = false;
-		public Boolean executeCalled = false;
-		public Boolean finishCalled = false;
-		public Exception startException;
-		public Exception executeException;
-		public Exception finishException;
-		
-		protected override Database.QueryLocator doStart(Database.BatchableContext bc) {
-			Test.getEventBus().deliver();
-			startCalled = true;
-			if (startException != null) {
-				throw startException;
-			}
-			return Database.getQueryLocator('SELECT Id FROM User LIMIT 1');
-		}
-		
-		protected override void doExecute(Database.BatchableContext bc, List<SObject> scope) {
-			executeCalled = true;
-			if (executeException != null) {
-				throw executeException;
-			}
-		}
-		
-		protected override void doFinish(Database.BatchableContext bc) {
-			finishCalled = true;
-			if (finishException != null) {
-				throw finishException;
-			}
-		}
-	}
 	
 	/**
 	 * Mock implementation of BatchableContext for testing
@@ -60,7 +25,7 @@ private class BatchableJobTest {
 		AsyncJobRequestService.instance.setBypass();
 		insert new AsyncJobRequest__c(
 			RecordTypeId = AsyncJobRequestConstants.recordType.BatchableId,
-			JobName__c = TestBatchableJob.class.getName(),
+			JobName__c = MockBatchableJob.class.getName(),
 			JobId__c = new FakeId(AsyncApexJob.sObjectType).getFakeId(),
 			BatchSize__c = 200
 		);
@@ -73,7 +38,7 @@ private class BatchableJobTest {
 			AsyncJobRequestConstants.JobStatus.Waiting.name()
 		);
 		Assert.areEqual(1, jobRequests.size(), 'Should have exactly one job request in Waiting status');
-		TestBatchableJob job = new TestBatchableJob();
+		MockBatchableJob job = new MockBatchableJob();
 		MockBatchableContext mockContext = new MockBatchableContext(jobRequests.get(0).JobId__c);
 		
 		Test.startTest();
@@ -97,7 +62,7 @@ private class BatchableJobTest {
 			AsyncJobRequestConstants.JobStatus.Waiting.name()
 		);
 		Assert.areEqual(1, jobRequests.size(), 'Should have exactly one job request in Waiting status');
-		TestBatchableJob job = new TestBatchableJob();
+		MockBatchableJob job = new MockBatchableJob();
 		job.startException = new IllegalArgumentException('Test exception message');
 		MockBatchableContext mockContext = new MockBatchableContext(jobRequests.get(0).JobId__c);
 		
@@ -123,7 +88,7 @@ private class BatchableJobTest {
 	
 	@IsTest
 	static void testExecuteMethodSuccess() {
-		TestBatchableJob job = new TestBatchableJob();
+		MockBatchableJob job = new MockBatchableJob();
 		MockBatchableContext mockContext = new MockBatchableContext(null);
 		List<SObject> scope = new List<SObject>{ new User(Id = UserInfo.getUserId()) };
 		
@@ -142,7 +107,7 @@ private class BatchableJobTest {
 			AsyncJobRequestConstants.JobStatus.Waiting.name()
 		);
 		Assert.areEqual(1, jobRequests.size(), 'Should have exactly one job request in Waiting status');
-		TestBatchableJob job = new TestBatchableJob();
+		MockBatchableJob job = new MockBatchableJob();
 		job.executeException = new IllegalArgumentException('Test exception message');
 		MockBatchableContext mockContext = new MockBatchableContext(jobRequests.get(0).JobId__c);
 		List<SObject> scope = new List<SObject>{ new User(Id = UserInfo.getUserId()) };
@@ -173,7 +138,7 @@ private class BatchableJobTest {
 			AsyncJobRequestConstants.JobStatus.Waiting.name()
 		);
 		Assert.areEqual(1, jobRequests.size(), 'Should have exactly one job request in Waiting status');
-		TestBatchableJob job = new TestBatchableJob();
+		MockBatchableJob job = new MockBatchableJob();
 		MockBatchableContext mockContext = new MockBatchableContext(jobRequests.get(0).JobId__c);
 		
 		Test.startTest();
@@ -197,7 +162,7 @@ private class BatchableJobTest {
 			AsyncJobRequestConstants.JobStatus.Waiting.name()
 		);
 		Assert.areEqual(1, jobRequests.size(), 'Should have exactly one job request in Waiting status');
-		TestBatchableJob job = new TestBatchableJob();
+		MockBatchableJob job = new MockBatchableJob();
 		job.finishException = new IllegalArgumentException('Test exception message');
 		MockBatchableContext mockContext = new MockBatchableContext(jobRequests.get(0).JobId__c);
 		

@@ -6,7 +6,7 @@ public with sharing class ChangeStatusJobEventHandlerTest {
 		AsyncJobRequestService.instance.setBypass();
 		insert new AsyncJobRequest__c(
 			RecordTypeId = AsyncJobRequestConstants.recordType.BatchableId,
-			JobName__c = BatchJobProcessorTestBatchableJob.class.getName(),
+			JobName__c = MockBatchableJob.class.getName(),
 			JobId__c = new FakeId(AsyncApexJob.sObjectType).getFakeId(),
 			BatchSize__c = 200
 		);
@@ -43,7 +43,7 @@ public with sharing class ChangeStatusJobEventHandlerTest {
 		AsyncJobRequestService.instance.setBypass();
 		insert new AsyncJobRequest__c(
 			RecordTypeId = AsyncJobRequestConstants.recordType.BatchableId,
-			JobName__c = BatchJobProcessorTestBatchableJob.class.getName(),
+			JobName__c = MockBatchableJob.class.getName(),
 			JobId__c = new FakeId(AsyncApexJob.sObjectType).getFakeId(),
 			BatchSize__c = 200
 		);
