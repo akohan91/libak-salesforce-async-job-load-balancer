@@ -20,10 +20,11 @@ public class AsyncJobRequestService {
 	/**
 	 * @description Publishes queue job events for the provided AsyncJobRequest records.
 	 * @param asyncJobRequests List of AsyncJobRequest__c records to process.
+	 * @return List of Database.SaveResult objects with publishing results
 	 */
-	public void publishQueueJobEvents(List<AsyncJobRequest__c> asyncJobRequests) {
+	public List<Database.SaveResult> publishQueueJobEvents(List<AsyncJobRequest__c> asyncJobRequests) {
 		if (bypass) {
-			return;
+			return new List<Database.SaveResult>();
 		}
 		List<AsyncJob__e> jobEvents = new List<AsyncJob__e>();
 		for (AsyncJobRequest__c jobRequestRecord : new AsyncJobRequestDistributor(asyncJobRequests).getNewAsyncJobRequests()) {
@@ -33,8 +34,9 @@ public class AsyncJobRequestService {
 			));
 		}
 		if (!jobEvents.isEmpty()) {
-			EventBus.publish(jobEvents);
+			return EventBus.publish(jobEvents);
 		}
+		return new List<Database.SaveResult>();
 	}
 
 	/**
