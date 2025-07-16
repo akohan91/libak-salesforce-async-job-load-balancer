@@ -1,8 +1,8 @@
-public with sharing class BatchFlexQueueService {
-	public static BatchFlexQueueService instance {
+public with sharing class BatchableFlexQueueService {
+	public static BatchableFlexQueueService instance {
 		get{
 			if (instance == null) {
-				instance = new BatchFlexQueueService();
+				instance = new BatchableFlexQueueService();
 			}
 			return instance;
 		}

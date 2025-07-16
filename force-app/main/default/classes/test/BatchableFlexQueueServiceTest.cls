@@ -1,12 +1,12 @@
 @IsTest
-private class BatchFlexQueueServiceTest {
+private class BatchableFlexQueueServiceTest {
 	
 	@IsTest
 	static void testSingletonPattern() {
 		// Test singleton pattern behavior
 		Test.startTest();
-		BatchFlexQueueService instance1 = BatchFlexQueueService.instance;
-		BatchFlexQueueService instance2 = BatchFlexQueueService.instance;
+		BatchableFlexQueueService instance1 = BatchableFlexQueueService.instance;
+		BatchableFlexQueueService instance2 = BatchableFlexQueueService.instance;
 		Test.stopTest();
 		
 		// Verify both instances are the same object
@@ -18,7 +18,7 @@ private class BatchFlexQueueServiceTest {
 	static void testGetAvailableFlexQueueSlotsWithNoHoldingJobs() {
 		
 		Test.startTest();
-		Integer availableSlots = BatchFlexQueueService.instance.getAvailableFlexQueueSlots();
+		Integer availableSlots = BatchableFlexQueueService.instance.getAvailableFlexQueueSlots();
 		Test.stopTest();
 		
 		// When no jobs are holding, all 100 slots should be available

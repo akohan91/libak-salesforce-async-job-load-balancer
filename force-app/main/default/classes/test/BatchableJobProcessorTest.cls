@@ -1,5 +1,5 @@
 @IsTest
-public with sharing class BatchJobProcessorTest {
+public with sharing class BatchableJobProcessorTest {
 	
 	@TestSetup
 	static void makeData(){
@@ -22,7 +22,7 @@ public with sharing class BatchJobProcessorTest {
 
 		Test.startTest();
 
-		new BatchJobProcessor().executeJob();
+		new BatchableJobProcessor().executeJob();
 		jobRequests = AsyncJobRequestSelector.instance.getByJobStatus(
 			AsyncJobRequestConstants.JobStatus.Pending.name()
 		);
@@ -49,7 +49,7 @@ public with sharing class BatchJobProcessorTest {
 
 		Test.startTest();
 
-		new BatchJobProcessor().executeJob();
+		new BatchableJobProcessor().executeJob();
 		jobRequests = AsyncJobRequestSelector.instance.getByJobStatus(
 			AsyncJobRequestConstants.JobStatus.Failed.name()
 		);

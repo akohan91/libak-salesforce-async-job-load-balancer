@@ -1,8 +1,8 @@
-public with sharing class BatchJobProcessor implements IAsyncJobExecutor {
+public with sharing class BatchableJobProcessor implements IAsyncJobExecutor {
 	public void executeJob() {
 		AsyncJobRequest jobRequest;
 		try {
-			if (BatchFlexQueueService.instance.getAvailableFlexQueueSlots() == 0) {
+			if (BatchableFlexQueueService.instance.getAvailableFlexQueueSlots() == 0) {
 				return;
 			}
 			AsyncJobRequest__c jobRequestRecord = AsyncJobRequestSelector.instance.getFirstBatchQueueItem();
