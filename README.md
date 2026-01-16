@@ -1,256 +1,211 @@
 # Async Job Load Balancer Framework
 
-> **Note:** This framework is currently in the development process. Features and implementations may change as development progresses.
+<a href="https://githubsfdeploy.herokuapp.com">
+  <img alt="Deploy to Salesforce" src="https://raw.githubusercontent.com/afawcett/githubsfdeploy/master/deploy.png">
+</a>
+<a href="https://www.linkedin.com/in/akohan">
+  <img
+    alt="akohan91 | LinkedIn"
+    src="https://content.linkedin.com/content/dam/me/business/en-us/amp/xbu/linkedin-revised-brand-guidelines/linkedin-logo/fg/brandg-linkedinlogo-hero-logo-dsk-v01.png.original.png"
+    height="28px"
+  >
+</a>
+
+---
+
+## Table of Contents
+
+- [Overview](#overview)
+- [Features](#features)
+- [Architecture](#architecture)
+- [Getting Started](#getting-started)
+- [Documentation](#documentation)
+- [Contributing](#contributing)
+- [License](#license)
+- [Contact](#contact)
+
+---
 
 ## Overview
 
-This framework provides a robust, event-driven mechanism for managing and load-balancing asynchronous Apex jobs (Batchable and Queueable) in Salesforce. It leverages custom objects, platform events, and Apex classes to queue, execute, monitor, and handle errors for asynchronous jobs, ensuring optimal resource utilization and extensibility.
+The **Async Job Load Balancer Framework** is an enterprise-grade, event-driven solution for managing and orchestrating asynchronous Apex jobs in Salesforce. Built for developers who need intelligent load balancing, automatic error handling, and comprehensive job lifecycle management for both Batch and Queueable Apex jobs.
+
+This framework is designed for Salesforce developers who need to:
+- Execute hundreds or thousands of async jobs efficiently
+- Automatically manage Salesforce governor limits (flex queue, queueable depth)
+- Track job execution with full audit trails
+- Handle job failures gracefully with built-in error logging
+- Scale asynchronous processing without manual intervention
+
+---
+
+## Features
+
+✨ **Event-Driven Architecture** - Leverages Platform Events for decoupled, scalable job orchestration
+
+🚀 **Automatic Load Balancing** - Intelligently queues jobs based on available flex queue slots and system capacity
+
+🔄 **Job Lifecycle Management** - Track jobs from request to completion with automatic status updates
+
+⚡ **Dual Job Support** - Seamlessly handles both Batchable and Queueable Apex jobs
+
+🛡️ **Built-in Error Handling** - Automatic error capture, logging, and retry mechanisms
+
+📊 **Full Audit Trail** - Complete visibility into job requests, execution times, and outcomes
+
+🔧 **Extensible Design** - Easy to extend with custom event handlers and job executors
+
+💡 **Declarative Job Creation** - Create job requests via UI, API, or code without complex setup
 
 ---
 
 ## Architecture
 
-### Key Components
+The framework uses a sophisticated event-driven architecture to decouple job creation from execution:
 
-- **AsyncJobRequest__c**: Custom object representing a job request, with fields for status, payload, job type, and tracking information.
-- **AsyncJob__e**: Platform Event used to communicate job actions, status changes, and errors between components.
-- **Apex Classes**: Encapsulate logic for job execution, event handling, and job request management.
-- **Triggers**: Listen for new job requests and platform events, initiating processing as needed.
+### Core Components
 
----
+- **AsyncJobRequest__c** - Custom object storing job requests with status, payload, and metadata
+- **AsyncJob__e** - Platform Event enabling real-time communication between components
+- **Job Processors** - Execute batch and queueable jobs with automatic lifecycle management
+- **Event Handlers** - Route and process job events (queue, status change, error)
+- **Base Job Classes** - Abstract classes (`BatchableJob`, `QueueableJob`) with built-in event publishing
 
-## Object Model
+### How It Works
 
-### AsyncJobRequest__c
-
-- **Fields**:
-  - `JobName__c`: Name of the Apex class to execute.
-  - `JobStatus__c`: Status (Waiting, Pending, Processing, Completed, Failed).
-  - `BatchSize__c`: Batch size for batch jobs.
-  - `Payload__c`: Serialized parameters (e.g., JSON).
-  - `JobId__c`: Associated Apex job ID.
-  - `RequestedTime__c`, `ProcessedTime__c`, `FinishedTime__c`: Timestamps for job lifecycle.
-  - `ErrorMessage__c`: Error details if job fails.
-
-- **Record Types**:
-  - `Batchable`
-  - `Queueable`
-
-### AsyncJob__e
-
-- **Fields**:
-  - `Action__c`: Event action (ADD_ERROR, QUEUE_JOB, CHANGE_STATUS).
-  - `AsyncJobId__c`: Related Apex job ID.
-  - `JobRequestId__c`, `JobRequestTypeId__c`: Reference to job request and its type.
-  - `Payload__c`: Event payload (status change, error message, etc.).
-
----
-
-## Event Flow
-
-1. **Job Request Creation**:  
-   A new `AsyncJobRequest__c` record is inserted (via UI, API, or code).
-
-2. **Trigger: AsyncJobRequestTrigger**  
-   - Publishes a `QUEUE_JOB` event for each new job request.
-
-3. **Trigger: AsyncJobEventTrigger**  
-   - Listens for `AsyncJob__e` events.
-   - Delegates handling to `AsyncJobEventService`.
-
-4. **AsyncJobEventService**  
-   - Routes events to appropriate handler based on `Action__c`:
-     - `QUEUE_JOB`: Starts job execution.
-     - `CHANGE_STATUS`: Updates job status.
-     - `ADD_ERROR`: Logs error message.
-
-5. **Job Execution**  
-   - `BatchableJobExecutor` or `QueueableJobExecutor` picks up the job request, instantiates the specified Apex class, and enqueues or executes the job.
-   - Job status and timestamps are updated accordingly.
-
-6. **Job Lifecycle Events**  
-   - As jobs progress or fail, platform events are published to update status or log errors.
-   - Completed or failed jobs may trigger new job executions if queue space is available.
-
----
-
-## Extension Points
-
-- **Custom Job Classes**:  
-  Implement `BatchJob` (for batchable) or `QueueableJob` (for queueable) and reference the class name in `JobName__c`.
-
-- **Event Handlers**:  
-  Implement `IAsyncJobEventHandler` and register in `AsyncJobEventService` for custom event actions.
-
-- **Executors**:  
-  Implement `IAsyncJobExecutor` for new job types or custom execution logic.
-
----
-
-## Key Classes
-
-- **AsyncJobRequest**: Wrapper for `AsyncJobRequest__c` with fluent setters and update logic.
-- **AsyncJobRequestSelector**: Query utility for job requests.
-- **AsyncJobRequestDistributor**: Groups job requests by type.
-- **BatchJob / QueueableJob**: Abstract base classes for custom jobs.
-- **BatchableJobExecutor / QueueableJobExecutor**: Execute jobs based on type.
-- **AsyncJobEventService**: Central event router.
-- **ErrorJobEventHandler / ChangeStatusJobEventHandler / QueueJobEventHandler**: Handle specific event actions.
+1. **Job Request Created** - Insert an `AsyncJobRequest__c` record
+2. **Event Published** - Trigger publishes `QUEUE_JOB` event
+3. **Event Routed** - `AsyncJobEventService` routes to appropriate handler
+4. **Job Executed** - Processor instantiates your class and enqueues/executes it
+5. **Status Updates** - Job publishes events as it progresses (Processing → Completed/Failed)
+6. **Automatic Queueing** - Next job picks up when capacity becomes available
 
 ---
 
 ## Getting Started
 
-### 1. Implement a Custom Job
+### Installation
 
-#### Batch Apex Job
+#### Option 1: Deploy to Salesforce Button
 
-To create a custom batch job, extend the `BatchJob` abstract class and implement its methods:
+Click the "Deploy to Salesforce" button at the top of this README.
 
-```java
-public with sharing class MyBatchJob extends BatchJob {
-    protected override Database.QueryLocator doStart(Database.BatchableContext batchContext) {
-        // Return a query locator for records to process
-        return Database.getQueryLocator([SELECT Id FROM Account]);
-    }
-    protected override void doExecute(Database.BatchableContext batchContext, List<SObject> scope) {
-        // Process each batch of records
-        // ...your logic...
-    }
-    protected override void doFinish(Database.BatchableContext batchContext) {
-        // Optional: logic after all batches are processed
-    }
-}
+#### Option 2: SFDX CLI
+
+```bash
+# Clone the repository
+git clone https://github.com/akohan91/libak-salesforce-async-job-load-balancer.git
+cd libak-salesforce-async-job-load-balancer
+
+# Deploy to your org
+sfdx force:source:deploy -p force-app -u YourOrgAlias
 ```
 
-#### Queueable Apex Job
+#### Option 3: Manual Package Installation
 
-To create a custom queueable job, extend the `QueueableJob` abstract class and implement its method:
+1. Download the source code
+2. Use Salesforce CLI or your preferred deployment tool
+3. Deploy the `force-app` directory to your target org
 
-```java
-public with sharing class MyQueueableJob extends QueueableJob {
-    protected override void doExecute(QueueableContext context) {
-        // Your queueable logic here
-    }
-}
-```
+### Quick Start
 
-### 2. Create a Job Request
+Create your first async job in 3 simple steps:
 
-Insert an `AsyncJobRequest__c` record with the following fields:
-- `JobName__c`: The name of your Apex class (e.g., `MyBatchJob` or `MyQueueableJob`)
-- `RecordTypeId`: Use the Batchable or Queueable record type
-- `BatchSize__c`: (For batch jobs) Specify the batch size
-- `Payload__c`: (Optional) Pass parameters as JSON
-
-Example (Apex):
+**Step 1:** Extend the base job class
 
 ```apex
-AsyncJobRequest__c req = new AsyncJobRequest__c(
+public class MyBatchJob extends BatchableJob {
+    protected override Database.QueryLocator doStart(Database.BatchableContext bc) {
+        return Database.getQueryLocator([SELECT Id FROM Account]);
+    }
+    protected override void doExecute(Database.BatchableContext bc, List<SObject> scope) {
+        // Your processing logic here
+    }
+    protected override void doFinish(Database.BatchableContext bc) {
+        // Optional cleanup logic
+    }
+}
+```
+
+**Step 2:** Create a job request
+
+```apex
+insert new AsyncJobRequest__c(
     JobName__c = 'MyBatchJob',
     RecordTypeId = AsyncJobRequestConstants.recordType.BatchableId,
-    BatchSize__c = 100
+    BatchSize__c = 200
 );
-insert req;
 ```
 
-### 3. Monitor and Extend
+**Step 3:** Watch it run
 
-- Monitor job status and errors via the Async Job Requests tab.
-- Implement additional event handlers by inheriting from `IAsyncJobEventHandler` and registering in `AsyncJobEventService` if needed.
+The framework automatically queues, executes, and tracks your job. Monitor progress in the Async Job Requests tab.
+
+### Documentation
+
+📚 **[Developer Guide](Developer_Guide.md)** - Step-by-step tutorials and implementation examples
+
+📖 **[API Reference](API_Reference.md)** - Complete technical documentation for all classes and methods
 
 ---
 
-## Usage
+## Contributing
 
-1. **Create a Job Request**  
-   Insert an `AsyncJobRequest__c` record with the appropriate record type, job class name, and parameters.
+Contributions are welcome! Whether you're fixing bugs, improving documentation, or adding new features, your help makes this framework better for everyone.
 
-2. **Implement Custom Jobs**  
-   - For batch jobs: Extend `BatchJob`.
-   - For queueable jobs: Extend `QueueableJob`.
+### How to Contribute
 
-3. **Monitor and Manage**  
-   Use the Async Job Requests tab and related lists to monitor status, errors, and execution history.
+1. **Fork the Repository**
+   ```bash
+   git clone https://github.com/akohan91/libak-salesforce-async-job-load-balancer.git
+   ```
+
+2. **Create a Feature Branch**
+   ```bash
+   git checkout -b feature/your-feature-name
+   ```
+   Branch naming conventions:
+   - `feature/` - New features
+   - `bugfix/` - Bug fixes
+   - `docs/` - Documentation updates
+
+3. **Make Your Changes**
+   - Write comprehensive tests
+   - Update documentation if needed
+
+4. **Commit Your Changes**
+   ```bash
+   git commit -m "Add: Brief description of your changes"
+   ```
+
+5. **Push and Create Pull Request**
+   ```bash
+   git push origin feature/your-feature-name
+   ```
+   Then open a Pull Request on GitHub with a clear description of your changes.
+
+### Code Standards
+
+- Follow SOLID principles and design patterns
+- Bulkify all code for collections
+- Use selector classes for SOQL queries
+- Add tests with meaningful assertions
+- Document public APIs with clear Apex docs
 
 ---
 
-## Notes
+## License
 
-- The framework automatically manages job queueing, execution, and error handling.
-- Flex queue space is respected for batch jobs.
-- All job status changes and errors are tracked and auditable.
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ---
 
-## Diagram
+## Contact
 
-Process Flow:
-```
-+-----------------------------+
-| 1. AsyncJobRequest__c       |
-|    CREATED                  |
-+-------------+---------------+
-              |
-              | Trigger fires
-              v
-+-------------+---------------+
-| 2. AsyncJobRequestTrigger   |
-|    PROCESSES REQUEST        |
-+-------------+---------------+
-              |
-              | Publishes event
-              v
-+-------------+---------------+
-| 3. AsyncJob__e              |
-|    QUEUE_JOB ACTION         |
-+-------------+---------------+
-              |
-              | Event received
-              v
-+-------------+---------------+
-| 4. AsyncJobEventTrigger     |
-|    HANDLES EVENT            |
-+-------------+---------------+
-              |
-              | Delegates to
-              v
-+-------------+---------------+
-| 5. AsyncJobEventService     |
-|    ROUTES EVENT             |
-+-------------+---------------+
-              |
-              | Routes to handler
-              v
-+-------------+---------------+
-| 6. QueueJobEventHandler     |
-|    PROCESSES QUEUE REQUEST  |
-+-------------+---------------+
-              |
-              | Executes via
-              v
-+-------------+---------------+
-| 7. Job Executor             |
-|   (Batchable/Queueable)     |
-+-------------+---------------+
-              |
-              | Initiates
-              v
-+-------------+---------------+
-| 8. Job Execution            |
-|    RUNNING                  |
-+-------------+---------------+
-              |
-              | Status updates/errors
-              v
-+-------------+---------------+
-| 9. AsyncJob__e              |
-|   (CHANGE_STATUS/ADD_ERROR) |
-+-------------+---------------+
-              |
-              | Feedback loop
-              v
-              +---------------+
-              | Back to step 4|
-              +---------------+
-```
+**Andrei Kakhanouski**
+
+For questions, suggestions, or collaboration opportunities, feel free to reach out!
+
+---
+
+> **Note:** This framework is actively maintained. For issues, feature requests, or contributions, please use the GitHub Issues and Pull Requests.
